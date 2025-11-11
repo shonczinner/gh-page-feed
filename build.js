@@ -61,6 +61,9 @@ html += `
 fs.writeFileSync(OUTPUT_HTML, html);
 console.log(`✅ ${OUTPUT_HTML} generated successfully.`);
 
+// Add this line for debugging paths
+console.log("📍 index.html path resolved to:", path.resolve(OUTPUT_HTML));
+
 // --- Utility ---
 function escapeHTML(str) {
   return str

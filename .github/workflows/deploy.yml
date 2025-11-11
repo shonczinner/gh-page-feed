@@ -27,9 +27,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # 4️⃣ Run build.js to generate index.html
       - name: Build HTML
-        run: npm run build
+        run: |
+          npm run build
+          echo "Files after build:"
+          dir   # Windows runner, or use `ls -la` on Linux
 
       # 5️⃣ Deploy to gh-pages
       - name: Deploy to GitHub Pages
