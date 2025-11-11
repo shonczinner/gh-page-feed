@@ -3,13 +3,23 @@ const path = require("path");
 
 // --- Config ---
 const SITE_TITLE = "My Feed";
-const INPUT_JSON = "index.json";
-const OUTPUT_HTML = "index.html";
+const INPUT_JSON = path.join(__dirname, "index.json");  // safe absolute path
+const OUTPUT_HTML = path.join(__dirname, "index.html"); // root is fine
 const STYLE_PATH = "style.css";
 
 // --- Read posts ---
+if (!fs.existsSync(INPUT_JSON)) {
+  console.error(`❌ Could not find ${INPUT_JSON}`);
+  process.exit(1);
+}
 const raw = fs.readFileSync(INPUT_JSON, "utf-8");
-const posts = JSON.parse(raw);
+let posts = [];
+try {
+  posts = JSON.parse(raw);
+} catch (err) {
+  console.error("❌ Failed to parse index.json:", err);
+  process.exit(1);
+}
 
 // --- Sort newest first ---
 posts.sort((a, b) => new Date(b.created) - new Date(a.created));
