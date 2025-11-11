@@ -1,0 +1,10 @@
+{
+  "name": "gh-page-feed",
+  "version": "1.0.0",
+  "description": "A minimal static feed built with Node.js and GitHub Actions",
+  "main": "build.js",
+  "scripts": {
+    "build": "node build.js"
+  },
+  "license": "MIT"
+}
