@@ -3,31 +3,38 @@ name: Build and Deploy Feed
 on:
   push:
     branches:
-      - main
+      - master   # your default branch
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      # 1️⃣ Checkout your repository
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      # 2️⃣ Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm install
 
+      # 4️⃣ Run your build.js script
       - name: Build HTML
         run: npm run build
 
+      # 5️⃣ Deploy only generated files to gh-pages
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./          # current folder contains index.html + style.css
+          publish_branch: gh-pages
