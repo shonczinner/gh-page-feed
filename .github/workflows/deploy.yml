@@ -43,7 +43,7 @@ jobs:
           git clean -fdx
 
           # Copy generated index.html
-          cp ../index.html
+          cp ../index.html . 
 
           # Pull style.css and README.md directly from master
           git show master:style.css > style.css
