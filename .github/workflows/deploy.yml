@@ -43,9 +43,9 @@ jobs:
           echo "🔹 Cleaning gh-pages branch"
           git rm -rf . || true
 
-          echo "🔹 Copying files"
-          # Copy built HTML + static assets + README
-          cp index.html style.css README.md . 2>/dev/null || true
+          echo "🔹 Copying files from master"
+          # Copy index.html (generated), style.css, README.md from workflow root
+          cp ../index.html ../style.css ../README.md . 2>/dev/null || true
 
           echo "🔹 Files in gh-pages after copy:"
           ls -la
