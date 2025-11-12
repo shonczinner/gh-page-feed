@@ -36,7 +36,7 @@ jobs:
           git fetch origin gh-pages
           git checkout gh-pages || git checkout --orphan gh-pages
           git rm -rf .
-          cp index.html style.css README.md . 2>/dev/null || true
+          git checkout master -- index.html style.css README.md || echo "Files not found"
           git add .
           git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
           git push origin gh-pages --force
