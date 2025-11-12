@@ -2,16 +2,16 @@ name: Build and deploy static site
 
 on:
   push:
-    branches: [ master ]   # your source branch
+    branches: [ master ]   # or main, your source branch
 
 permissions:
   contents: write
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Checkout the repository
+      # 1️⃣ Checkout repo
       - uses: actions/checkout@v4
 
       # 2️⃣ Setup Node.js
@@ -22,41 +22,34 @@ jobs:
       # 3️⃣ Install dependencies
       - run: npm install
 
-      # 4️⃣ Build HTML
+      # 4️⃣ Run build script
       - run: npm run build
 
-      # 5️⃣ Confirm generated files
+      # 5️⃣ Optional: see generated files
       - run: ls -la
 
-      # 6️⃣ Deploy to gh-pages
+      # 6️⃣ Push built files to gh-pages branch
       - name: Deploy to gh-pages
         run: |
           # Configure Git
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Make a temporary folder for files
-          mkdir -p temp-deploy
-
-          # Copy generated index.html into temp
-          cp index.html temp-deploy/
-
-          # Copy style.css and README.md from master into temp
-          git show master:style.css > temp-deploy/style.css
-          git show master:README.md > temp-deploy/README.md
-
-          # Switch to gh-pages (or create orphan)
+          # Fetch gh-pages, create orphan if needed
           git fetch origin gh-pages
           git checkout gh-pages || git checkout --orphan gh-pages
 
-          # Clean the branch
+          # Clean old files
           git rm -rf . || true
-          git clean -fdx
 
-          # Move files from temp into root
-          cp -r temp-deploy/* .
+          # Copy the built index.html from runner
+          cp index.html .  
+
+          # Copy style.css and README.md from master safely
+          git show master:style.css > style.css
+          git show master:README.md > README.md
 
           # Commit and push
           git add .
-          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
           git push origin gh-pages --force
