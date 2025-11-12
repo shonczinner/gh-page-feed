@@ -23,3 +23,5 @@ A minimal static twitter-feed style blog generated from a single `index.json` fi
 ##  How to host on github pages
 
 deploy.yml file in the master/main branch file will run build.js and push index.html to branch gh-pages. All you need to do is ensure that your repository is set up to deploy from that branch (Settings->Pages->Deploy from a branch->gh-pages/(root))
+
+In this case https://shonczinner.github.io/gh-page-feed/
