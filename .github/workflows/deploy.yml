@@ -1,49 +1,34 @@
-name: Build and Deploy Feed
+name: Deploy static site
 
 on:
   push:
-    branches:
-      - master
-
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
+    branches: [ master ]  # or main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build HTML
-        run: npm run build
-
-      - name: Upload static files as artifact
+      - run: npm ci
+      - run: npm run build
+      - run: ls -la
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./
-          # or "./dist" if you put index.html/style.css there
+          path: .   # or wherever index.html gets created
 
   deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
-    needs: build
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
