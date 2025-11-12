@@ -40,24 +40,18 @@ jobs:
           echo "🔹 Checking out gh-pages branch"
           git checkout gh-pages || git checkout --orphan gh-pages
 
-          echo "🔹 Current files in gh-pages before clean:"
-          ls -la || dir
-
           echo "🔹 Cleaning gh-pages branch"
           git rm -rf . || true
 
-          echo "🔹 Files in master to copy:"
-          git ls-tree -r master --name-only
-
-          echo "🔹 Copying files from master"
-          git checkout master -- index.html style.css README.md || echo "⚠️ Files not found"
+          echo "🔹 Copying files"
+          # Copy built HTML + static assets + README
+          cp index.html style.css README.md . 2>/dev/null || true
 
           echo "🔹 Files in gh-pages after copy:"
-          ls -la || dir
+          ls -la
 
           git add .
           git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
 
           echo "🔹 Pushing to gh-pages"
           git push origin gh-pages --force
-
