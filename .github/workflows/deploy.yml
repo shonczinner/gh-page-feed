@@ -42,9 +42,6 @@ jobs:
           # Clean old files
           git rm -rf . || true
 
-          # Copy the built index.html from runner
-          cp index.html .  
-
           # Copy style.css and README.md from master safely
           git show master:style.css > style.css
           git show master:README.md > README.md
