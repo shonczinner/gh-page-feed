@@ -29,29 +29,27 @@ jobs:
       - run: ls -la
 
       # 6️⃣ Push built files to gh-pages branch
-      - name: Push HTML to gh-pages
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Deploy to gh-pages
+              run: |
+                # Configure Git
+                git config user.name "github-actions[bot]"
+                git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          echo "🔹 Fetching gh-pages branch"
-          git fetch origin gh-pages
+                # Fetch gh-pages, create orphan if needed
+                git fetch origin gh-pages
+                git checkout gh-pages || git checkout --orphan gh-pages
 
-          echo "🔹 Checking out gh-pages branch"
-          git checkout gh-pages || git checkout --orphan gh-pages
+                # Clean old files
+                git rm -rf . || true
 
-          echo "🔹 Cleaning gh-pages branch"
-          git rm -rf . || true
+                # Copy the built index.html from runner
+                cp index.html .  
 
-          echo "🔹 Copying files from master"
-          # Copy index.html (generated), style.css, README.md from workflow root
-          cp ../index.html ../style.css ../README.md . 2>/dev/null || true
+                # Copy style.css and README.md from master safely
+                git show master:style.css > style.css
+                git show master:README.md > README.md
 
-          echo "🔹 Files in gh-pages after copy:"
-          ls -la
-
-          git add .
-          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-
-          echo "🔹 Pushing to gh-pages"
-          git push origin gh-pages --force
+                # Commit and push
+                git add .
+                git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
+                git push origin gh-pages --force
