@@ -1,42 +1,48 @@
-name: Deploy static site
+name: Build and deploy static site
 
 on:
   push:
-    branches: [ master ]  # or main
+    branches: [ master ]   # or main
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
-        run: npm install
+      - run: npm ci
+      - run: npm run build
+      - run: ls -la
 
-      - name: Build static files
-        run: npm run build
-
-      - name: List output
-        run: ls -la
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .   # if using dist/, change to dist
+      # Push built files to gh-pages branch
+      - name: Push HTML to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin gh-pages
+          git checkout gh-pages
+          git rm -rf .
+          cp ../index.html ../style.css ../index.json ../README.md . 2>/dev/null || true
+          git add .
+          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git push origin gh-pages
 
   deploy:
-    needs: build
     runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Deploy to GitHub Pages
+      - name: Deploy from gh-pages
         id: deployment
         uses: actions/deploy-pages@v4
