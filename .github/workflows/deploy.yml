@@ -42,12 +42,11 @@ jobs:
           git rm -rf . || true
           git clean -fdx
 
-          # Copy style.css and README.md from master safely
+          # Copy generated index.html
+          cp index.html ./index.html
+          # Pull style.css and README.md directly from master
           git show master:style.css > style.css
           git show master:README.md > README.md
-
-          # index.html is already in root from build.js, so no need to cp
-
           git add .
-          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
           git push origin gh-pages --force
