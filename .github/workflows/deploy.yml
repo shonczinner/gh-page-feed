@@ -6,39 +6,45 @@ on:
       - master
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
 
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
-
     steps:
-      # 1️⃣ Checkout repository
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣ Setup Node.js
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: npm install
 
       - name: Build HTML
-        run: |
-          npm run build
-          echo "Files after build:"
-          dir   # Windows runner, or use `ls -la` on Linux
+        run: npm run build
 
-      # 5️⃣ Deploy to gh-pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_branch: gh-pages
-          publish_dir: ./
-          force_orphan: true
+          path: ./
+          # or "./dist" if you put index.html/style.css there
 
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
