@@ -12,13 +12,20 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm ci
-      - run: npm run build
-      - run: ls -la
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build static files
+        run: npm run build
+
+      - name: List output
+        run: ls -la
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .   # or wherever index.html gets created
+          path: .   # if using dist/, change to dist
 
   deploy:
     needs: build
