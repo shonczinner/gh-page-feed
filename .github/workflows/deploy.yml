@@ -33,10 +33,31 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          echo "🔹 Fetching gh-pages branch"
           git fetch origin gh-pages
+
+          echo "🔹 Checking out gh-pages branch"
           git checkout gh-pages || git checkout --orphan gh-pages
-          git rm -rf .
-          git checkout master -- index.html style.css README.md || echo "Files not found"
+
+          echo "🔹 Current files in gh-pages before clean:"
+          ls -la || dir
+
+          echo "🔹 Cleaning gh-pages branch"
+          git rm -rf . || true
+
+          echo "🔹 Files in master to copy:"
+          git ls-tree -r master --name-only
+
+          echo "🔹 Copying files from master"
+          git checkout master -- index.html style.css README.md || echo "⚠️ Files not found"
+
+          echo "🔹 Files in gh-pages after copy:"
+          ls -la || dir
+
           git add .
-          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes"
+          git commit -m "Deploy $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
+
+          echo "🔹 Pushing to gh-pages"
           git push origin gh-pages --force
+
